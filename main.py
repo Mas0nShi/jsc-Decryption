@@ -109,8 +109,10 @@ def decrypt(filePath, key):
         fio = BytesIO(dec_data)
         fzip = zipfile.ZipFile(file=fio)
         dec_data = fzip.read(fzip.namelist()[0]).decode("utf-8")
-    else:
+    elif dec_data[:2] == b"\x1f\x8b":
         dec_data = bytes(zlib.decompress(dec_data, 16 + zlib.MAX_WBITS)).decode("utf-8")
+    else:
+        dec_data = bytes(dec_data).decode("utf-8")
     return dec_data
 
 
@@ -158,4 +160,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+     main()
