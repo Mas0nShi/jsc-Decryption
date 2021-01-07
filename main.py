@@ -4,6 +4,8 @@ import os
 import traveDir
 import sys
 import random
+import zipfile
+from io import BytesIO
 
 try:
     from shutil import get_terminal_size as get_terminal_size
@@ -14,6 +16,7 @@ except:
         pass
 try:
     import click
+
 except:
     class click:
 
@@ -72,9 +75,11 @@ class ColorPrinter:
     @staticmethod
     def print_cyan_text(content, end="\n"):
         print("\033[1;36m %s \033[0m" % content, end=end),
+
     @staticmethod
     def print_white_text(content, end="\n"):
         print("\033[1;37m %s \033[0m" % content, end=end),
+
 
 def read_jsc_file(path):
     f = open(path, "rb")
@@ -86,7 +91,6 @@ def read_jsc_file(path):
 def save_file(fileDir, outData):
     rootPath = os.path.split(fileDir)[0]
     try:
-        # print("creating dir (%s)" % (rootPath))
         os.makedirs(rootPath)
     except OSError:
         if not os.path.exists(rootPath):
@@ -101,8 +105,13 @@ def save_file(fileDir, outData):
 def decrypt(filePath, key):
     data = read_jsc_file(path=filePath)
     dec_data = xxtea.decrypt(data=data, key=key, padding=False)
-    dec_data = zlib.decompress(dec_data, 16 + zlib.MAX_WBITS)
-    return bytes(dec_data).decode()
+    if dec_data[:2] == b"PK":
+        fio = BytesIO(dec_data)
+        fzip = zipfile.ZipFile(file=fio)
+        dec_data = fzip.read(fzip.namelist()[0]).decode("utf-8")
+    else:
+        dec_data = bytes(zlib.decompress(dec_data, 16 + zlib.MAX_WBITS)).decode("utf-8")
+    return dec_data
 
 
 def batch_decrypt(srcDir, xxtea_key):
@@ -142,7 +151,9 @@ def main():
     srcDir = sys.argv[3]
     if instruct[1:2] == "d":
         show_banner()
+
         batch_decrypt(srcDir=srcDir, xxtea_key=xxtea_key)
+
         ColorPrint.print_white_text("Running exit...\n")
 
 
