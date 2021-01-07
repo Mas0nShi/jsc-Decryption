@@ -5,7 +5,7 @@
 🌈The core process is the decryption of **`XXTEA`** and **`GZIP`**.🌈
 
 ### Usage :
-python main.py [-d] [xxteaKey] [jscDir]
+        python main.py [-d] [xxteaKey] [jscDir]
 ### Example :
         python main.py -d 6362d9fe-c3ad-47 C:\DecJsc-master\src
 ### Tips :
