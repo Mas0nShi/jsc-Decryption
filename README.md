@@ -13,5 +13,8 @@
 ### Outputs :
         The output folder is located in the same directory as the JSC folder.
 
-
+### Waiting for repair and Known errors :
+        The zip type cannot be decrypted.
+        
+        
 If you have any questions, please contact [ MasonShi@88.com ]
