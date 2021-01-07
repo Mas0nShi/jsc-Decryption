@@ -3,6 +3,7 @@
 ⚡This is a script that decrypts the coco2d-js.jsc file⚡
 
 🌈The core process is the decryption of **`XXTEA`** and **`GZIP`**.🌈
+
 ### Usage :
         python main.py [-d] [xxteaKey] [jscDir]
 ### Example :
