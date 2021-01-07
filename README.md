@@ -17,6 +17,6 @@
 - [x] The XXTEA&zip mode cannot be decrypted.
 - [x] XXTEA mode cannot be decrypted.
 
-![example](http://shi1011.cn/assets/img/jsc-Decompile_example.png)
+![example](https://github.com/shiyingqi/jsc-Decompile/blob/main/jsc-Decompile_example.png)
 
 If you have any questions, please contact [ MasonShi@88.com ]
