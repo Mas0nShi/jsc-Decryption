@@ -13,7 +13,7 @@
 ### Outputs :
         The output folder is located in the same directory as the JSC folder.
 
-### ⚠⚠⚠Waiting for repair and Known errors :
+### ❗Waiting for repair and Known errors :
 - [x] The XXTEA&zip mode cannot be decrypted.
 - [x] XXTEA mode cannot be decrypted.
 
