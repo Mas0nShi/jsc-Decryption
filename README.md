@@ -1,4 +1,4 @@
-﻿# jsc-Decompile
+﻿# jsc-Decryption
 
 ⚡This is a script that decrypts the coco2d-js.jsc file⚡
 
