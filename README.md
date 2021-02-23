@@ -11,8 +11,7 @@
 ### Tips :
         -d or -decrypt [decrypt]
 ### Outputs :
-        `shell
-        The output folder is located in the same directory as the JSC folder.`
+        The output folder is located in the same directory as the JSC folder.
 
 ### ❗Waiting for repair and Known errors :
 - [x] The XXTEA&zip mode cannot be decrypted.
