@@ -1,4 +1,6 @@
 ﻿# jsc-Decryption
+ 
+⛔For xxtea only, nothing can be done with bytecode⛔
 
 ⚡This is a script that decrypts the coco2d-js.jsc file⚡
 
