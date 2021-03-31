@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+# @Time    : 2021-03-31 22:03
+# @Author  : Mas0n
+# @FileName: main.py
+# @Software: PyCharm
+# @Blog    ：https://blog.shi1011.cn
+
 import xxtea
 import zlib
 import os
@@ -89,6 +96,13 @@ def read_jsc_file(path):
 
 
 def save_file(fileDir, outData):
+    """
+    保存解密文件
+
+    :param fileDir: 文件目录
+    :param outData: 保存数据
+    :return: None
+    """
     rootPath = os.path.split(fileDir)[0]
     try:
         os.makedirs(rootPath)
@@ -98,7 +112,7 @@ def save_file(fileDir, outData):
     if fileDir.endswith("c"):
         file = fileDir[:-1]
 
-    if isinstance(outData, str):
+    if isinstance(outData, str):  # 判断数据类型 以防utf8转码失败的文件无法保存
         with open(file, "w", encoding="utf-8") as fd:
             fd.write(outData)
     else:
@@ -108,6 +122,13 @@ def save_file(fileDir, outData):
 
 
 def decrypt(filePath, key):
+    """
+    核心为XXtea 附zip/gzip压缩
+
+    :param filePath: 文件目录
+    :param key: xxteaKey
+    :return: None
+    """
     data = read_jsc_file(path=filePath)
     dec_data = xxtea.decrypt(data=data, key=key, padding=False)
     if dec_data[:2] == b"PK":
@@ -126,6 +147,13 @@ def decrypt(filePath, key):
 
 
 def batch_decrypt(srcDir, xxtea_key):
+    """
+    块解密
+
+    :param srcDir: 文件夹目录
+    :param xxtea_key: xxteaKey
+    :return: None
+    """
     if not os.path.exists(srcDir):
         ColorPrinter.print_white_text("Error:FileNotFound")
         exit(1)
