@@ -36,7 +36,6 @@ banner = """
   8  `888'   888   .oP"888  `"Y88b.  888    888  888   888 
   8    Y     888  d8(  888  o.  )88b `88b  d88'  888   888 
   o8o        o888o `Y888""8o 8""888P'  `Y8bd8P'  o888o o888o 
-
                      Running Start                           
 \n"""
 
@@ -98,8 +97,13 @@ def save_file(fileDir, outData):
             raise Exception("Error: create directory %s failed." % rootPath)
     if fileDir.endswith("c"):
         file = fileDir[:-1]
-    with open(file, "w", encoding="utf-8") as fd:
-        fd.write(outData)
+
+    if isinstance(outData, str):
+        with open(file, "w", encoding="utf-8") as fd:
+            fd.write(outData)
+    else:
+        with open(file, "wb") as fd:
+            fd.write(outData)
     fd.close()
 
 
@@ -113,7 +117,11 @@ def decrypt(filePath, key):
     elif dec_data[:2] == b"\x1f\x8b":
         dec_data = bytes(zlib.decompress(dec_data, 16 + zlib.MAX_WBITS)).decode("utf-8")
     else:
-        dec_data = bytes(dec_data).decode("utf-8")
+        try:
+            dec_data = bytes(dec_data).decode("utf-8")
+        except UnicodeDecodeError:
+            ColorPrinter.print_blue_text("    This file looks like have some unknown byte, try save as unknown files")
+
     return dec_data
 
 
@@ -154,9 +162,7 @@ def main():
     srcDir = sys.argv[3]
     if instruct[1:2] == "d":
         show_banner()
-
         batch_decrypt(srcDir=srcDir, xxtea_key=xxtea_key)
-
         ColorPrint.print_white_text("Running exit...\n")
 
 
