@@ -129,6 +129,8 @@ def decrypt(filePath, key):
     :param key: xxteaKey
     :return: None
     """
+    if len(key) < 16:
+        key += "".join("\0" * (16 - len(key)))  # key填充
     data = read_jsc_file(path=filePath)
     dec_data = xxtea.decrypt(data=data, key=key, padding=False)
     if dec_data[:2] == b"PK":
