@@ -8,7 +8,8 @@
 import xxtea
 import zlib
 import os
-import traveDir
+from traveDir import depthIteratePath
+from loguru import logger
 import sys
 import random
 import zipfile
@@ -43,6 +44,7 @@ banner = """
   8  `888'   888   .oP"888  `"Y88b.  888    888  888   888 
   8    Y     888  d8(  888  o.  )88b `88b  d88'  888   888 
   o8o        o888o `Y888""8o 8""888P'  `Y8bd8P'  o888o o888o 
+
                      Running Start                           
 \n"""
 
@@ -88,14 +90,14 @@ class ColorPrinter:
         print("\033[1;37m %s \033[0m" % content, end=end),
 
 
-def read_jsc_file(path):
+def readJscFile(path):
     f = open(path, "rb")
     data = f.read()
     f.close()
     return data
 
 
-def save_file(fileDir, outData):
+def saveFile(fileDir, outData):
     """
     保存解密文件
 
@@ -131,7 +133,7 @@ def decrypt(filePath, key):
     """
     if len(key) < 16:
         key += "".join("\0" * (16 - len(key)))  # key填充
-    data = read_jsc_file(path=filePath)
+    data = readJscFile(path=filePath)
     dec_data = xxtea.decrypt(data=data, key=key, padding=False)
     if dec_data[:2] == b"PK":
         fio = BytesIO(dec_data)
@@ -148,12 +150,12 @@ def decrypt(filePath, key):
     return dec_data
 
 
-def batch_decrypt(srcDir, xxtea_key):
+def batchDecrypt(srcDir, xxteaKey):
     """
     块解密
 
     :param srcDir: 文件夹目录
-    :param xxtea_key: xxteaKey
+    :param xxteaKey: xxteaKey
     :return: None
     """
     if not os.path.exists(srcDir):
@@ -161,16 +163,20 @@ def batch_decrypt(srcDir, xxtea_key):
         exit(1)
     rootDir = os.path.split(srcDir)[0]
     outDir = rootDir
-    if outDir[-2:-1] != "\\":
-        outDir += "\\"
-    outDir += "out\\"
-    traveDir.deep_iterate_dir(srcDir)
-    files_list = traveDir.getfileslist()
-    for file_path in files_list:
-        ColorPrinter.print_green_text("Decrypting flie:{0}".format(file_path))
-        decData = decrypt(filePath=file_path, key=xxtea_key)
-        outFile = outDir + file_path[len(rootDir + os.path.split(srcDir)[1]) + 1:]
-        save_file(fileDir=outFile, outData=decData)
+    outDir = os.path.join(rootDir, "out")
+    if os.path.isfile(srcDir):
+        filesPathArr = [srcDir]
+    elif os.path.isdir(srcDir):
+        filesPathArr = depthIteratePath([".jsc"]).getDepthDir(srcDir)
+    else:
+        logger.error("UnknownError -> setPathExt")
+        exit(-1)
+
+    for filePath in filesPathArr:
+        ColorPrinter.print_green_text("Decrypting flie:{0}".format(filePath))
+        decData = decrypt(filePath=filePath, key=xxteaKey)
+        outFile = outDir + filePath[len(rootDir + os.path.split(srcDir)[1]) + 1:]
+        saveFile(fileDir=outFile, outData=decData)
         print("        Save flie:{0}".format(outFile))
 
 
@@ -192,8 +198,8 @@ def main():
     srcDir = sys.argv[3]
     if instruct[1:2] == "d":
         show_banner()
-        batch_decrypt(srcDir=srcDir, xxtea_key=xxtea_key)
-        ColorPrint.print_white_text("Running exit...\n")
+        batchDecrypt(srcDir=srcDir, xxteaKey=xxtea_key)
+        ColorPrint.print_white_text("    Running exit...\n")
 
 
 if __name__ == "__main__":
