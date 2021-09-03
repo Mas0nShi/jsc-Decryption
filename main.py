@@ -14,6 +14,33 @@ import sys
 import random
 import zipfile
 from io import BytesIO
+import json
+
+def setExtFile(rootPath, type):
+    filePath = os.path.join(rootPath, "JSC-DECRYPTION")
+    with open(filePath, "w") as f:
+        f.write(json.dump({
+            "Tools": "jsc-Decrytion",
+            "Verify": "True",
+            "Type": type
+        }))
+
+
+def getExtFile(rootPath, type):
+    filePath = os.path.join(rootPath, "JSC-DECRYPTION")
+    with open(filePath, "r", encoding="utf-8") as f:
+        try:
+            rePackType = json.loads(f.read())
+        except json.JSONDecodeError:
+            logger.error("jsonDecodeError")
+            exit(-1)
+
+    if rePackType["Tools"] != "jsc-Decrytion" or rePackType["Verify"] != "True":
+        logger.error("read JSC-DECRYPTION Error")
+        exit(-1)
+
+    return rePackType["Type"]
+
 
 try:
     from shutil import get_terminal_size as get_terminal_size
@@ -131,23 +158,28 @@ def decrypt(filePath, key):
     :param key: xxteaKey
     :return: None
     """
-    if len(key) < 16:
+    if key == "NONE":
+        key = "\x00" * 16
+    elif len(key) < 16:
         key += "".join("\0" * (16 - len(key)))  # key填充
     data = readJscFile(path=filePath)
     dec_data = xxtea.decrypt(data=data, key=key, padding=False)
     if dec_data[:2] == b"PK":
+        decType = "zip"
         fio = BytesIO(dec_data)
         fzip = zipfile.ZipFile(file=fio)
         dec_data = fzip.read(fzip.namelist()[0]).decode("utf-8")
     elif dec_data[:2] == b"\x1f\x8b":
+        decType = "gzip"
         dec_data = bytes(zlib.decompress(dec_data, 16 + zlib.MAX_WBITS)).decode("utf-8")
     else:
+        decType = "unknown"
         try:
             dec_data = bytes(dec_data).decode("utf-8")
         except UnicodeDecodeError:
             ColorPrinter.print_blue_text("    This file looks like have some unknown byte, try save as unknown files")
 
-    return dec_data
+    return decType, dec_data
 
 
 def batchDecrypt(srcDir, xxteaKey):
@@ -174,10 +206,20 @@ def batchDecrypt(srcDir, xxteaKey):
 
     for filePath in filesPathArr:
         ColorPrinter.print_green_text("Decrypting flie:{0}".format(filePath))
-        decData = decrypt(filePath=filePath, key=xxteaKey)
+        decType, decData = decrypt(filePath=filePath, key=xxteaKey)
         outFile = outDir + filePath[len(rootDir + os.path.split(srcDir)[1]) + 1:]
         saveFile(fileDir=outFile, outData=decData)
         print("        Save flie:{0}".format(outFile))
+
+
+def encrypt():
+    # TODO: no process
+    pass
+
+
+def batchEncrypt():
+    # TODO: no process
+    pass
 
 
 def main():
@@ -191,6 +233,7 @@ def main():
         print(r"        python {0} -d 6362d9fe-c3ad-47 C:\DecJsc-master\src".format(sys.argv[0]))
         ColorPrint.print_white_text("Tips : ")
         print("        -d or -decrypt [decrypt]")
+        print("        If the TEA is 16 bytes of \\x00, please fill in NONE")
         print("        If you have any questions, please contact [ MasonShi@88.com ]\n")
         exit(1)
     instruct = sys.argv[1]
