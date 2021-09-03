@@ -12,6 +12,7 @@
         python main.py -d 6362d9fe-c3ad-47 C:\DecJsc-master\src
 ### Tips :
         -d or -decrypt [decrypt]
+        If the TEA is 16 bytes of \\x00, please fill in NONE
 ### Outputs :
         The output folder is located in the same directory as the JSC folder.
 
